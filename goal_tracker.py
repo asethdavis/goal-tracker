@@ -10,6 +10,37 @@ from google.oauth2.service_account import Credentials
 # Streamlit UI Setup
 st.set_page_config(page_title="Goal Tracker", page_icon="📅", layout="wide")
 
+# Set page config (must be first)
+st.set_page_config(page_title="Goal Tracker", page_icon="📅", layout="wide")
+
+# Store password in Streamlit Secrets (Go to Streamlit Cloud > Manage App > Secrets)
+PASSWORD = st.secrets["APP_PASSWORD"]
+
+# Initialize session state for authentication
+if "authenticated" not in st.session_state:
+    st.session_state["authenticated"] = False
+
+# Simple login mechanism
+if not st.session_state["authenticated"]:
+    st.title("🔐 Login to Goal Tracker")
+
+    # Password input field
+    password = st.text_input("Enter Password:", type="password")
+
+    # Check password
+    if st.button("Login"):
+        if password == PASSWORD:
+            st.session_state["authenticated"] = True
+            st.experimental_rerun()  # Refresh page after login
+        else:
+            st.error("Incorrect password. Try again.")
+
+    st.stop()  # Prevents the rest of the app from loading if not logged in
+
+# If authenticated, continue with the app
+st.success("✅ Logged in successfully!")
+st.write("Welcome to your Goal Tracker! 🎯")
+
 # Load credentials securely from Streamlit Secrets
 if "GOOGLE_SHEETS_CREDENTIALS" in st.secrets:
     try:
