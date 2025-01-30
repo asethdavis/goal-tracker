@@ -11,7 +11,9 @@ from google.oauth2.service_account import Credentials
 client = None
 
 # Load credentials securely from Streamlit Secrets
-st.write("Available Secrets:", st.secrets.keys())
+#st.write("Available Secrets:", st.secrets.keys())
+# Streamlit UI Setup
+st.set_page_config(page_title="Goal Tracker", page_icon="📅", layout="wide")
 
 if "GOOGLE_SHEETS_CREDENTIALS" in st.secrets:
     try:
@@ -36,8 +38,7 @@ journal_sheet = client.open_by_key(SHEET_ID).worksheet("Journal")  # New Journal
 # Get today's date
 today = datetime.datetime.now().strftime("%m/%d/%Y")
 
-# Streamlit UI Setup
-st.set_page_config(page_title="Goal Tracker", page_icon="📅", layout="wide")
+
 
 # Sidebar Navigation
 tab = st.sidebar.radio("Navigation", ["🏠 Main", "📊 Summary", "✏️ Edit/Add Goals", "📖 Journal", "💬 Chat with GPT"])
