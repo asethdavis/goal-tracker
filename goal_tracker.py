@@ -11,7 +11,7 @@ from google.oauth2.service_account import Credentials
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
 # Load credentials from GitHub Secrets
-service_account_info = json.loads(st.secrets["GOOGLE_CREDENTIALS"])
+service_account_info = json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"])
 credentials = Credentials.from_service_account_info(service_account_info, scopes=["https://www.googleapis.com/auth/spreadsheets"])
 client = gspread.authorize(credentials)
 
