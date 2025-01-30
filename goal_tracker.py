@@ -7,9 +7,14 @@ import pandas as pd
 from google.oauth2.service_account import Credentials
 
 # Google Sheets API Setup
-SERVICE_ACCOUNT_FILE = "service_account.json"
+import json
+import os
+
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-credentials = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+
+# Load credentials from GitHub Secrets
+service_account_json = os.getenv("GOOGLE_SHEETS_CREDENTIALS")
+credentials = Credentials.from_service_account_info(json.loads(service_account_json))
 client = gspread.authorize(credentials)
 
 # Open Google Sheets
