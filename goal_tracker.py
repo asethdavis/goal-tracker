@@ -7,9 +7,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from google.oauth2.service_account import Credentials
 
-# Streamlit UI Setup
-st.set_page_config(page_title="Goal Tracker", page_icon="📅", layout="wide")
-
 # Set page config (must be first)
 st.set_page_config(page_title="Goal Tracker", page_icon="📅", layout="wide")
 
