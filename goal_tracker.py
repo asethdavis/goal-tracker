@@ -4,24 +4,26 @@ import openai
 import os
 import datetime
 import pandas as pd
+import json 
 from google.oauth2.service_account import Credentials
 
 # Google Sheets API Setup
-import json
-
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
 # Load credentials from GitHub Secrets
 service_account_json = os.getenv("GOOGLE_SHEETS_CREDENTIALS")
 
-if not service_account_json:
-    st.error("❌ Error: Google Sheets credentials are missing. Please check your GitHub Secrets.")
-    st.stop()  # Stop execution to prevent further errors
+if not service_account_json or service_account_json.strip() == "":
+    st.error("❌ Error: Google Sheets credentials are missing. Check your GitHub Secrets.")
+    st.stop()  # Stop execution if credentials are missing
 
-# Convert JSON string to dictionary
-credentials = Credentials.from_service_account_info(json.loads(service_account_json))
-
-client = gspread.authorize(credentials)
+try:
+    # Convert JSON string to dictionary
+    credentials = Credentials.from_service_account_info(json.loads(service_account_json))
+    client = gspread.authorize(credentials)
+except Exception as e:
+    st.error(f"❌ Failed to load Google Sheets credentials: {e}")
+    st.stop()
 
 # Open Google Sheets
 SHEET_ID = "1bbqswqlXR8KHkq0mRpsumSR4cw4QS16nd-o28J1OS_o"
