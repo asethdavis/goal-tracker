@@ -3,17 +3,29 @@ import gspread
 import openai
 import os
 import datetime
+import json
 import pandas as pd
-import json 
 from google.oauth2.service_account import Credentials
 
-# Google Sheets API Setup
-SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+# Ensure client is always defined
+client = None
 
-# Load credentials from GitHub Secrets
-service_account_info = json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"])
-credentials = Credentials.from_service_account_info(service_account_info, scopes=["https://www.googleapis.com/auth/spreadsheets"])
-client = gspread.authorize(credentials)
+# Load credentials securely from Streamlit Secrets
+st.write("Available Secrets:", st.secrets.keys())
+
+if "GOOGLE_SHEETS_CREDENTIALS" in st.secrets:
+    try:
+        service_account_info = st.secrets["GOOGLE_SHEETS_CREDENTIALS"]
+        credentials = Credentials.from_service_account_info(service_account_info, scopes=["https://www.googleapis.com/auth/spreadsheets"])
+        client = gspread.authorize(credentials)
+    except Exception as e:
+        st.error(f"❌ Error loading Google credentials: {e}")
+else:
+    st.error("❌ Google Credentials not found. Please add them in Streamlit Secrets.")
+
+# Prevent app from running further if client is None
+if client is None:
+    st.stop()
 
 # Open Google Sheets
 SHEET_ID = "1bbqswqlXR8KHkq0mRpsumSR4cw4QS16nd-o28J1OS_o"
