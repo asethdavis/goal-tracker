@@ -8,13 +8,19 @@ from google.oauth2.service_account import Credentials
 
 # Google Sheets API Setup
 import json
-import os
 
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
 # Load credentials from GitHub Secrets
 service_account_json = os.getenv("GOOGLE_SHEETS_CREDENTIALS")
+
+if not service_account_json:
+    st.error("❌ Error: Google Sheets credentials are missing. Please check your GitHub Secrets.")
+    st.stop()  # Stop execution to prevent further errors
+
+# Convert JSON string to dictionary
 credentials = Credentials.from_service_account_info(json.loads(service_account_json))
+
 client = gspread.authorize(credentials)
 
 # Open Google Sheets
