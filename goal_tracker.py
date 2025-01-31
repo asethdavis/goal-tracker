@@ -5,6 +5,7 @@ import os
 import datetime
 import pandas as pd
 import matplotlib.pyplot as plt
+from openai import OpenAI
 from google.oauth2.service_account import Credentials
 
 # Set page config (must be first)
@@ -160,16 +161,47 @@ elif tab == "📖 Journal":
 elif tab == "💬 Chat with GPT":
     st.title("💬 Chat with GPT About Your Goals & Journal")
 
-    user_input = st.chat_input("Ask GPT about your goals...")
+    st.write(
+        "This chatbot uses OpenAI's GPT-4 model to generate responses. "
+        "To use this app, you need to provide an OpenAI API key, which you can get [here](https://platform.openai.com/account/api-keys)."
+    )
 
-    if user_input:
-        openai_api_key = os.getenv("OPENAI_API_KEY")
-        client = openai.OpenAI(api_key=openai_api_key)
+    # Ask user for their OpenAI API key via text input.
+    openai_api_key = st.text_input("🔑 Enter your OpenAI API Key", type="password")
 
-        response = client.chat.completions.create(
+    if not openai_api_key:
+        st.info("Please enter your OpenAI API key to continue.", icon="🗝️")
+        st.stop()  # Stop execution until the API key is provided
+
+    # Initialize OpenAI client with the provided API key.
+    client = OpenAI(api_key=openai_api_key)
+
+    # **Maintain chat history in session state**
+    if "messages" not in st.session_state:
+        st.session_state["messages"] = []
+
+    # **Display existing chat messages**
+    for message in st.session_state["messages"]:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    # **Chat input field**
+    if user_input := st.chat_input("Ask GPT about your goals, deadlines, or progress..."):
+
+        # **Store and display user message**
+        st.session_state["messages"].append({"role": "user", "content": user_input})
+        with st.chat_message("user"):
+            st.markdown(user_input)
+
+        # **Generate AI response**
+        stream = client.chat.completions.create(
             model="gpt-4",
-            messages=[{"role": "user", "content": user_input}]
+            messages=st.session_state["messages"],  # Full conversation history
+            stream=True
         )
 
-        reply = response.choices[0].message.content
-        st.markdown(reply)
+        # **Stream and store response**
+        with st.chat_message("assistant"):
+            response = st.write_stream(stream)
+
+        st.session_state["messages"].append({"role": "assistant", "content": response})
